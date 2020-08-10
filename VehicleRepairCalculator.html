@@ -1,0 +1,340 @@
+<html>
+
+	<head>
+		<title>Vehicle Repair Calculator</title>
+		<script>
+			// cost to repair = damage * .05 * vehicle total value
+			function Calculate() {
+				CalculateRepairCost();
+				CalculateRepairTime();
+			}
+
+			function CalculateRepairCost() {
+
+				var calc = 0;
+
+				// Repairs Input
+				var cost = document.getElementById("inputVehicleCost").value;
+				var damage = document.getElementById("inputVehicleDamage").value;
+
+				calc = parseInt(damage) * 0.05 * parseInt(cost);
+				calc = Math.round(calc);
+				//var oRepairCost = document.getElementById("outputRepairCost");
+				//oRepairCost.value = calc;
+				var oSummaryCost = document.getElementById("summaryCost");
+				oSummaryCost.value = calc;
+
+				// Parts Availability
+				var iVehicleAvailabilityTN = document.getElementById("inputVehicleAvailabilityTN");
+				var iVehicleAvailabilityTimeQty = document.getElementById("inputVehicleAvailabilityTimeQty");
+				var iVehicleAvailabilityTimeUnits = document.getElementById("inputVehicleAvailabilityTimeUnits");
+
+				var oPartsAvailabilityTN = document.getElementById("outputPartsAvailabilityTN");
+				var oPartsAvailabilityTimeQty = document.getElementById("outputPartsAvailabilityTimeQty");
+				var oPartsAvailabilityTimeUnits = document.getElementById("outputPartsAvailabilityTimeUnits");
+
+				oPartsAvailabilityTN.value = iVehicleAvailabilityTN.value;
+				oPartsAvailabilityTimeQty.value = iVehicleAvailabilityTimeQty.value;
+				oPartsAvailabilityTimeUnits.value = iVehicleAvailabilityTimeUnits.value;
+
+				// Repairs TN Input
+				calc = parseInt(damage) + 2;
+				var oRepairTN = document.getElementById("outputRepairTN");
+				oRepairTN.value = calc;
+
+
+			}
+
+			function CalculateRepairTime() {
+				/*
+				outputRepairTime
+				inputRepairSuccesses
+				*/
+
+				var iRepairSuccesses = document.getElementById("inputRepairSuccesses");
+				//var oRepairTime = document.getElementById("outputRepairTime");
+
+				calc = 16 / parseInt(iRepairSuccesses.value);
+				calc = Math.round(calc);
+				//oRepairTime.value = calc;
+
+				var oSummaryTime = document.getElementById("summaryTime");
+				oSummaryTime.value = calc;
+
+			}
+		</script>
+		<style>
+
+			/**************************************************************************/
+			/*
+			/* Default Formatting
+			/*
+			/**************************************************************************/
+
+			.tooltip {
+			  position: relative;
+			  display: inline-block;
+			  border-bottom: 1px dotted black; /* If you want dots under the hoverable text */
+			}
+
+			/* Tooltip text */
+			.tooltip .tooltiptext {
+			  visibility: hidden;
+			  width: 240px;
+			  background-color: black;
+			  color: #fff;
+			  text-align: center;
+			  padding: 5px 0;
+			  border-radius: 6px;
+
+			  /* Position the tooltip text - see examples below! */
+			  position: absolute;
+			  z-index: 1;
+			}
+
+			/* Show the tooltip text when you mouse over the tooltip container */
+			.tooltip:hover .tooltiptext {
+			  visibility: visible;
+			}
+
+			input:focus {
+	  		border: 1px solid #555;
+				background-color: #EEEEEE;
+			}
+
+			input:read-only {
+				background-color: #BBBBBB;
+				color: #000000;
+			}
+
+			input {
+    		text-align: center;
+			}
+
+			body {
+				background-color:black;
+			}
+			table {
+				background-color:white;
+				vertical-align: top;
+			}
+			th {
+				vertical-align: top;
+			}
+			td {
+				vertical-align: top;
+				/*text-align: left;*/
+			}
+			/**************************************************************************/
+			/*
+			/* Layout Control Table
+			/*
+			/**************************************************************************/
+
+			table.LayoutControl {
+				border: 1px solid black;
+				padding: 10px;
+				border-radius:12px;
+				width:1px;
+			}
+
+			tr:hover.LayoutControl {
+				background-color: #EEEEEE;
+			}
+
+			th.LayoutControl {
+		   	font-variant: small-caps;
+				padding:12px;
+				text-align:center;
+			}
+
+			td.LayoutControl {
+				padding-right: 8px;
+			}
+
+			input:focus.LayoutControl {
+	  		border: 1px solid #555;
+				background-color: #EEEEEE;
+			}
+
+			input:read-only.LayoutControl {
+				background-color: #BBBBBB;
+				color: #000000;
+			}
+
+			button.LayoutControl {
+				box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2), 0 6px 10px 0 rgba(0,0,0,0.19);
+			}
+
+			button:hover.LayoutControl {
+  			box-shadow: 0 4px 8px 0 rgba(0,0,0,0.24), 0 6px 10px 0 rgba(0,0,0,0.19);
+			}
+
+			/**************************************************************************/
+			/*
+			/* Sub Table
+			/*
+			/**************************************************************************/
+
+			table.SubTable {
+				padding: 10px;
+				border: 1px solid black;
+				border-collapse: collapse;
+
+			}
+
+			th.SubTable {
+				padding: 10px;
+				border: 1px solid black;
+
+			}
+
+			td.SubTable {
+				padding: 5px;
+				border: 1px solid black;
+				vertical-align: top;
+  			/*text-align: left;*/
+
+			}
+
+		</style>
+	</head>
+	<body>
+		<center>
+			<table width=1px class=LayoutControl>
+				<tbody>
+					<tr>
+						<th colspan=3>
+							Vehicle Repair Calculator
+							<hr>
+						</th>
+					</tr>
+					<tr>
+						<td>
+							<div class="tooltip">
+								<b>Damage to Repair</b>
+								<span class="tooltiptext">Total number of damage boxes the vehicle has sustained</span>
+							</div>
+						</td>
+						<td>
+							<input id=inputVehicleDamage type=number min=0 max=30 value=0 size=16 onchange=Calculate() />
+						</td>
+						<td>
+						</td>
+					</tr>
+					<tr>
+						<td>
+							<div class="tooltip">
+								<b>Vehicle's Total Value</b>
+								<span class="tooltiptext">Total value of the vehicle including all modifications</span>
+							</div>
+						</td>
+						<td>
+							<input id=inputVehicleCost type=number min=0 max=100000000000 value=0 size=16 onchange=Calculate() />
+						</td>
+						<td>
+						</td>
+					</tr>
+					<tr>
+						<td>
+							<div class="tooltip">
+								<b>Availability</b>
+								<span class="tooltiptext">Availability of the vehicle</span>
+							</div>
+						</td>
+						<td>
+							<input id=inputVehicleAvailabilityTN value=0 size=1 onchange=Calculate() />
+							/
+							<input id=inputVehicleAvailabilityTimeQty value=0 size=1 onchange=Calculate() />
+							<input id=inputVehicleAvailabilityTimeUnits value=months size=4 onchange=Calculate() />
+						</td>
+						<td>
+						</td>
+					</tr>
+					<tr>
+						<td>
+							<div class="tooltip">
+								<b>Total Repair Cost</b>
+								<span class="tooltiptext">Cost in Nuyen to purchase the required parts to repair the vehicle</span>
+							</div>
+						</td>
+						<td>
+							<input readonly id=outputRepairCost size=10 onchange=Calculate() />
+						</td>
+						<td>
+						</td>
+					</tr>
+					<tr>
+						<td>
+							<div class="tooltip">
+								<b>Parts Availability</b>
+								<span class="tooltiptext">Availability of the parts required to make repairs. Once these parts are obtained you can begin making repairs.</span>
+							</div>
+						</td>
+						<td>
+							<input readonly id=outputPartsAvailabilityTN value="" size=1 />
+							/
+							<input readonly id=outputPartsAvailabilityTimeQty value="" size=1  />
+							<input readonly id=outputPartsAvailabilityTimeUnits value=months size=4 />
+						</td>
+						<td style=text-align:center;>
+							<div class="tooltip">
+								<i><b>Note!</b></i>
+								<span class="tooltiptext">Roll Build/Repair skill for availability rather than etiquette. <p>See SR3 p149 for more details.</span>
+							</div>
+						</td>
+					</tr>
+					<tr>
+						<td>
+							<div class="tooltip">
+								<b>Repair TN</b>
+								<span class="tooltiptext">Target Number for Build/Repair Test</span>
+							</div>
+						</td>
+						<td>
+							<input readonly id=outputRepairTN size=1 />
+						</td>
+					</tr>
+					<tr>
+						<td>
+							<div class="tooltip">
+								<b>B/R Successes</b>
+								<span class="tooltiptext">Roll Build/Repair with a target number of "Repair TN" above. <p>Enter the number of successes here.</span>
+							</div>
+						</td>
+						<td>
+							<input id=inputRepairSuccesses value=0 size=1 onchange=Calculate() />
+						</td>
+						<td>
+						</td>
+					</tr>
+
+					<tr>
+						<th colspan=3>
+							<hr>
+							<center>Summary
+							<hr>
+						</th>
+					</tr>
+					<tr>
+						<td>
+							<b>Total Repair Cost</b>
+						</td>
+						<td>
+							<input readonly id=summaryCost value=0 size=10 onchange=Calculate() />
+						</td>
+					</tr>
+					<tr>
+						<td>
+							<b>Time to Repair</b>
+						</td>
+						<td>
+							<input readonly id=summaryTime value=0 size=1 />
+							<input readonly id=summaryTimeUnits value=hours size=3 />
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		</center>
+	</body>
+</html>
