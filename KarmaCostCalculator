@@ -1,0 +1,336 @@
+<html>
+	<head>
+		<title>Karma Cost Calculator</title>
+		<script>
+
+			var debugmode = false;
+
+			function GetSelectedRadio( radiosetname ) {
+				var radios = document.getElementsByName( radiosetname);
+				for (var i = 0, length = radios.length; i < length; i++) {
+				  if (radios[i].checked) {
+				    return radios[i];
+				    break;
+				  }
+				}
+			}
+
+			function debugalert( text ) {
+				if( debugmode == true ) {
+					alert(text);
+				}
+			}
+
+			function CalculateKarmaCost() {
+
+				var totalkarmacost = 0;
+				var skillspecialization = document.getElementById("check_IsSpecialization").checked;
+				var skilltype = GetSelectedRadio("Radio_SelectAbilityActiveKnowledgeSkill").value;
+				var targetrank = parseInt(document.getElementById("TargetSkillRanks").value);
+				var thisrank = parseInt(document.getElementById("CurrentSkillRanks").value);
+				var attribute = parseInt(document.getElementById("attributescore").value);
+
+debugalert("totalkarmacost: " + totalkarmacost + "\nskillspecialization: " + skillspecialization + "\nskilltype: " + skilltype + "\ntargetrank: " + targetrank + "\nthisrank: " + thisrank + "\nattribute: " + attribute);
+
+				if(thisrank < targetrank ) {
+					totalkarmacost = GetKarmaCostRecursive(attribute, thisrank + 1, targetrank, skilltype, skillspecialization);
+				} else {
+					totalkarmacost = 0;
+				}
+				document.getElementById("outputKarmaCost").value = totalkarmacost;
+
+			}
+
+			function GetKarmaCostRecursive(attribute, thisrank, targetrank, skilltype, skillspecialization) {
+
+				var costmultiplier = 1;
+				var totalkarmacost = 0;
+
+				attribute = parseInt(attribute);
+				thisrank = parseInt(thisrank);
+				targetrank = parseInt(targetrank);
+
+				if(skilltype=="active") {
+					if(skillspecialization) {
+						if(thisrank <= attribute) {
+							costmultiplier = 0.5;
+						} else if(thisrank <= (attribute * 2)) {
+							costmultiplier = 1.0;
+						} else {
+							costmultiplier = 1.5;
+						}
+
+					} else {
+
+						if(thisrank <= attribute) {
+							costmultiplier = 1.5;
+						} else if(thisrank <= (attribute * 2)) {
+							costmultiplier = 2.0;
+						} else {
+							costmultiplier = 2.5;
+						}
+
+					}
+
+				} else if(skilltype=="knowledge") {
+
+					if(skillspecialization) {
+
+						if(thisrank <= attribute) {
+							costmultiplier = 0.5;
+						} else if(thisrank <= (attribute * 2)) {
+							costmultiplier = 1.0;
+						} else {
+							costmultiplier = 1.5;
+						}
+
+					} else {
+
+						if(thisrank <= attribute) {
+							costmultiplier = 1.0;
+						} else if(thisrank <= (attribute * 2)) {
+							costmultiplier = 1.5;
+						} else {
+							costmultiplier = 2.0;
+						}
+
+					}
+
+				} else if( skilltype == "attribute") {
+					costmultiplier = 2;
+				}
+
+				totalkarmacost = Math.floor(thisrank * costmultiplier);
+
+				if(thisrank != targetrank) {
+					totalkarmacost = totalkarmacost + GetKarmaCostRecursive(attribute, thisrank + 1, targetrank, skilltype, skillspecialization);
+				}
+
+				return totalkarmacost;
+
+			}
+
+			</script>
+
+		<style>
+
+			/**************************************************************************/
+			/*
+			/* Default Formatting
+			/*
+			/**************************************************************************/
+
+			.tooltip {
+			  position: relative;
+			  display: inline-block;
+			  border-bottom: 1px dotted black; /* If you want dots under the hoverable text */
+			}
+
+			/* Tooltip text */
+			.tooltip .tooltiptext {
+			  visibility: hidden;
+			  width: 240px;
+			  background-color: black;
+			  color: #fff;
+			  text-align: center;
+			  padding: 5px 0;
+			  border-radius: 6px;
+
+			  /* Position the tooltip text - see examples below! */
+			  position: absolute;
+			  z-index: 1;
+			}
+
+			/* Show the tooltip text when you mouse over the tooltip container */
+			.tooltip:hover .tooltiptext {
+			  visibility: visible;
+			}
+
+			input:focus {
+	  		border: 1px solid #555;
+				background-color: #EEEEEE;
+			}
+
+			input:read-only {
+				background-color: #BBBBBB;
+				color: #000000;
+			}
+
+			input {
+    		text-align: center;
+			}
+
+			body {
+				background-color:black;
+			}
+			table {
+				background-color:white;
+				vertical-align: top;
+			}
+			th {
+				vertical-align: top;
+			}
+			td {
+				vertical-align: top;
+				/*text-align: left;*/
+			}
+			/**************************************************************************/
+			/*
+			/* Layout Control Table
+			/*
+			/**************************************************************************/
+
+			table.LayoutControl {
+				border: 1px solid black;
+				padding: 10px;
+				border-radius:12px;
+			}
+
+			tr:hover.LayoutControl {
+				background-color: #EEEEEE;
+			}
+
+			th.LayoutControl {
+		   	font-variant: small-caps;
+				padding:12px;
+				text-align:center;
+			}
+
+			td.LayoutControl {
+				padding-right: 8px;
+			}
+
+			input:focus.LayoutControl {
+	  		border: 1px solid #555;
+				background-color: #EEEEEE;
+			}
+
+			input:read-only.LayoutControl {
+				background-color: #BBBBBB;
+				color: #000000;
+			}
+
+			button.LayoutControl {
+				box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2), 0 6px 10px 0 rgba(0,0,0,0.19);
+			}
+
+			button:hover.LayoutControl {
+  			box-shadow: 0 4px 8px 0 rgba(0,0,0,0.24), 0 6px 10px 0 rgba(0,0,0,0.19);
+			}
+
+			/**************************************************************************/
+			/*
+			/* Sub Table
+			/*
+			/**************************************************************************/
+
+			table.SubTable {
+				padding: 10px;
+				border: 1px solid black;
+				border-collapse: collapse;
+
+			}
+
+			th.SubTable {
+				padding: 10px;
+				border: 1px solid black;
+
+			}
+
+			td.SubTable {
+				padding: 5px;
+				border: 1px solid black;
+				vertical-align: top;
+  			/*text-align: left;*/
+
+			}
+
+		</style>
+	</head>
+	<body onload=CalculateKarmaCost() >
+		<center>
+			<table class=LayoutControl>
+				<tbody>
+					<tr>
+						<th colspan=3>
+							<hr>
+							Karma Cost Calculator
+							<hr>
+						</th>
+					</tr>
+					<tr>
+						<td colspan=3>
+							<center>Follow each of the sections below to calculate the cost of improving Abilities, Active Skills, or Knowledge Skills.
+						</td>
+					</tr>
+					<tr>
+						<td colspan=3>
+							<hr>
+							<center><b>Total Karma Cost
+							<hr>
+						</td>
+					</tr>
+					<tr>
+						<td colspan=3>
+							<center><input readonly size=3 id=outputKarmaCost />
+						</td>
+					</tr>
+					<tr>
+						<td colspan=3>
+							<center>
+							<hr>
+								<b>Related Attribute</b>
+							<hr>
+						</td>
+					</tr>
+					<tr>
+						<td colspan=3>
+							<center><input id=attributescore type=number value=1 size=3 min=1 onchange=CalculateKarmaCost() />
+						</td>
+					</tr>
+					<tr>
+						<td colspan=3>
+							<center>
+							<hr>
+								<b>Ranks</b>
+							<hr>
+						</td>
+					</tr>
+					<tr>
+						<td colspan=3>
+							<center><b>Current Rank</b>
+							<p><input id=CurrentSkillRanks type=number value=0 size=3 min=0 onchange=CalculateKarmaCost() />
+							<p>
+							<p><b>Target Rank</b>
+							<p><input id=TargetSkillRanks type=number value=0 size=3 min=0 onchange=CalculateKarmaCost() />
+						</td>
+					</tr>
+					<tr>
+						<td colspan=3>
+							<center>
+							<hr>
+								<b>Options</b>
+							<hr>
+						</td>
+					</tr>
+					<tr>
+						<td nowrap width=49%>
+
+						</td>
+						<td nowrap width=1%>
+							<b>
+							<input type=radio id=radio_IsActiveSkill name=Radio_SelectAbilityActiveKnowledgeSkill value=active onclick=CalculateKarmaCost() checked=checked/> Active Skill
+							<p><input type=radio id=radio_IsKnowledgeSkill name=Radio_SelectAbilityActiveKnowledgeSkill value=knowledge onclick=CalculateKarmaCost() /> Knowledge Skill
+							<p><input type=radio id=radio_IsAbilityScore name=Radio_SelectAbilityActiveKnowledgeSkill value=attribute onclick=CalculateKarmaCost() /> Ability
+							<p><input type="checkbox" id=check_IsSpecialization name=CheckBox_Specialization onclick="CalculateKarmaCost()"> Specialization
+							</b>
+						</td>
+						<td nowrap width=49%>
+							&nbsp;
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		</center>
+	</body>
+</html>
