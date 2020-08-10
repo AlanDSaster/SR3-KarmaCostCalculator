@@ -1,0 +1,775 @@
+<html>
+
+	<head>
+
+		<title>Melee Combat TN Calculator</title>
+
+		<script>
+
+			function CalculateTN() {
+
+				var CB_CalledShot = document.getElementById("cb_calledshot");
+				var CB_SuperiorPosition = document.getElementById("cb_superiorposition");
+				var CB_OpponentProne = document.getElementById("cb_opponentprone");
+				var IB_OtherModifiers= document.getElementById("ib_othermodifiers");
+				var IB_FriendsInMelee = document.getElementById("ib_friendsinmelee");
+				var IB_OpponentsInMelee = document.getElementById("ib_opponentsinmelee");
+				var IB_AttackerReach = document.getElementById("ib_attackerreach");
+				var IB_DefenderReach = document.getElementById("ib_defenderreach");
+				var RADIO_Visibility_ConditionIndex = GetSelectedRadio("radio_visibility_condition");
+				var RADIO_Visibility_VisionTypeIndex = GetSelectedRadio("radio_visibility_visiontype");
+				var IB_StunDamage = document.getElementById("ib_stundamage");
+				var IB_PhysicalDamage = document.getElementById("ib_physicaldamage");
+				var RADIO_ReachOption = GetSelectedRadio("radio_reachoption");
+				var IB_NumberOfTargets = document.getElementById("ib_numberoftargets");
+
+				var Textbox_Output = document.getElementById("outputTN1");
+
+				var baseTN = 4;
+				var modifier_CalledShot=0;
+				var modifier_SuperiorPosition=0;
+				var modifier_OpponentProne=0;
+				var modifier_OtherModifiers=0;
+				var modifier_FriendsAndFoesInCombat=0;
+				var modifier_Visibility=0;
+				var modifier_Wounds=0;
+				var modifier_Reach=0;
+				var modifier_MultipleTargets=0;
+
+
+				modifier_CalledShot = GetCalledShotModifier(CB_CalledShot);
+				modifier_SuperiorPosition = GetSuperiorPositionModifier(CB_SuperiorPosition);
+				modifier_OpponentProne = GetOpponentProneModifier(CB_OpponentProne);
+				modifier_OtherModifiers = IB_OtherModifiers.value;
+				modifier_FriendsAndFoesInCombat = GetFriendsAndFoesInCombatModifier(IB_FriendsInMelee.value, IB_OpponentsInMelee.value);
+				modifier_Visibility = GetVisibilityModifier(RADIO_Visibility_ConditionIndex.value, RADIO_Visibility_VisionTypeIndex.value);
+				modifier_Wounds = GetWoundsModifier(IB_StunDamage.value, IB_PhysicalDamage.value);
+				modifier_Reach = GetReachModifier(IB_AttackerReach.value, IB_DefenderReach.value, RADIO_ReachOption.value);
+				modifier_MultipleTargets = GetMultipleTargetsModifier(IB_NumberOfTargets);
+
+				baseTN = parseInt(baseTN);
+				modifier_CalledShot = parseInt(modifier_CalledShot);
+				modifier_SuperiorPosition = parseInt(modifier_SuperiorPosition);
+				modifier_OpponentProne = parseInt(modifier_OpponentProne);
+				modifier_OtherModifiers = parseInt(modifier_OtherModifiers);
+				modifier_FriendsAndFoesInCombat = parseInt(modifier_FriendsAndFoesInCombat);
+				modifier_Visibility = parseInt(modifier_Visibility);
+				modifier_Wounds = parseInt(modifier_Wounds);
+				modifier_Reach = parseInt(modifier_Reach);
+				modifier_MultipleTargets = parseInt(modifier_MultipleTargets);
+
+				totalTN =
+					baseTN
+					+ modifier_CalledShot
+					+ modifier_SuperiorPosition
+					+ modifier_OpponentProne
+					+ modifier_OtherModifiers
+					+ modifier_FriendsAndFoesInCombat
+					+ modifier_Visibility
+					+ modifier_Wounds
+					+ modifier_Reach
+					+ modifier_MultipleTargets;
+
+				if(totalTN < 2) {
+					totalTN = 2;
+				}
+
+				Textbox_Output.value = totalTN;
+
+			}
+
+			function GetCalledShotModifier(cb) {
+				if(cb.checked) {
+					return 4;
+				} else {
+					return 0;
+				}
+			}
+			function GetSuperiorPositionModifier(cb) {
+				if(cb.checked) {
+					return -1;
+				} else {
+					return 0;
+				}
+			}
+			function GetOpponentProneModifier(cb) {
+				if(cb.checked) {
+					return -2;
+				} else {
+					return 0;
+				}
+			}
+			function GetFriendsAndFoesInCombatModifier(friends, foes) {
+				var x = friends - foes;
+				if(x > 4) {
+					x = 4;
+				} else if(x < -4) {
+					x = -4;
+				}
+				return x;
+			}
+			function GetVisibilityModifier(index_condition, index_visiontype) {
+
+				var visibilitytable = [
+					[ 0, 0, 0, 0, 0 ],
+					[ 8, 8, 8, 4, 2 ],
+					[ 6, 4, 2, 4, 2 ],
+					[ 2, 1, 0, 2, 1 ],
+					[ 2, 4, 2, 4, 2 ],
+					[ 2, 4, 2, 4, 2 ],
+					[ 4, 4, 2, 0, 0 ],
+					[ 6, 6, 4, 1, 0 ],
+					[ 4, 4, 4, 8, 6 ]
+				];
+
+				var visibilitymodifier = visibilitytable[index_condition][index_visiontype];
+
+				return visibilitymodifier;
+
+			}
+			function GetWoundsModifier(stundamage, physicaldamage) {
+				/**************************************************************************
+				*
+				* Wounds Modifier
+				*
+				***************************************************************************/
+
+				var woundsmodifier = 0;
+				var stundamagemodifier = 0;
+				var physicaldamagemodifier = 0;
+
+				if( stundamage < 1 ) {
+					stundamagemodifier = 0;
+				} else if( stundamage < 3 ) {
+					stundamagemodifier = 1;
+				} else if( stundamage < 6 ) {
+					stundamagemodifier = 2;
+				} else {
+					stundamagemodifier = 3;
+				}
+
+				if( physicaldamage < 1 ) {
+					physicaldamagemodifier = 0;
+				} else if( physicaldamage < 3 ) {
+					physicaldamagemodifier = 1;
+				} else if( physicaldamage < 6 ) {
+					physicaldamagemodifier = 2;
+				} else {
+					physicaldamagemodifier = 3;
+				}
+
+				woundsmodifier = physicaldamagemodifier + stundamagemodifier;
+
+				return woundsmodifier;
+			}
+			function GetReachModifier(atk_reach, def_reach, reachoption) {
+				var reachmod = 0;
+
+				switch(reachoption) {
+					case "rd_attacker_enhance":
+						reachmod = def_reach - atk_reach;
+						break;
+					case "rd_attacker_inhibit_defender":
+						break;
+					case "rd_defender_inhibit_attacker":
+						reachmod = def_reach - atk_reach;
+						break;
+					case "rd_defender_enhance":
+						break;
+				}
+
+				return reachmod;
+			}
+			function GetMultipleTargetsModifier(ib) {
+				var x = (ib.value - 1) * 2;
+				return x;
+			}
+
+			function GetSelectedRadio( radiosetname ) {
+				var radios = document.getElementsByName( radiosetname);
+				for (var i = 0, length = radios.length; i < length; i++) {
+				  if (radios[i].checked) {
+				    return radios[i];
+				    break;
+				  }
+				}
+			}
+
+			function debugalert( text ) {
+				if( debugmode == true ) {
+					alert(text);
+				}
+			}
+
+		</script>
+
+		<style>
+
+			/**************************************************************************/
+			/*
+			/* Default Formatting
+			/*
+			/**************************************************************************/
+
+			.tooltip {
+			  position: relative;
+			  display: inline-block;
+			  border-bottom: 1px double black; /* If you want dots under the hoverable text */
+			}
+
+			/* Tooltip text */
+			.tooltip .tooltiptext {
+			  visibility: hidden;
+			  width: 480px;
+			  background-color: black;
+			  color: #fff;
+			  text-align: left;
+			  padding: 10px 0;
+			  border-radius: 6px;
+
+			  /* Position the tooltip text - see examples below! */
+			  position: absolute;
+			  z-index: 1;
+			}
+
+			/* Show the tooltip text when you mouse over the tooltip container */
+			.tooltip:hover .tooltiptext {
+			  visibility: visible;
+			}
+
+			input:focus {
+	  		border: 1px solid #555;
+				background-color: #EEEEEE;
+			}
+
+			input:read-only {
+				background-color: #BBBBBB;
+				color: #000000;
+			}
+
+			input {
+    		text-align: center;
+			}
+
+			body {
+				background-color:black;
+			}
+			table {
+				background-color:white;
+				vertical-align: top;
+			}
+			th {
+				vertical-align: top;
+			}
+			td {
+				vertical-align: top;
+				/*text-align: left;*/
+			}
+			/**************************************************************************/
+			/*
+			/* Layout Control Table
+			/*
+			/**************************************************************************/
+
+			table.LayoutControl {
+				border:1px solid black;
+				padding:10px;
+				border-radius:12px;
+				width:1px;
+			}
+
+			tr:hover.LayoutControl {
+				background-color: #EEEEEE;
+			}
+
+			th.LayoutControl {
+		   	font-variant: small-caps;
+				padding:12px;
+				text-align:center;
+			}
+
+			td.LayoutControl {
+				padding-right: 8px;
+			}
+
+			input:focus.LayoutControl {
+	  		border: 1px solid #555;
+				background-color: #EEEEEE;
+			}
+
+			input:read-only.LayoutControl {
+				background-color: #BBBBBB;
+				color: #000000;
+			}
+
+			button.LayoutControl {
+				box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2), 0 6px 10px 0 rgba(0,0,0,0.19);
+			}
+
+			button:hover.LayoutControl {
+  			box-shadow: 0 4px 8px 0 rgba(0,0,0,0.24), 0 6px 10px 0 rgba(0,0,0,0.19);
+			}
+
+			/**************************************************************************/
+			/*
+			/* Sub Table
+			/*
+			/**************************************************************************/
+
+			table.SubTable {
+				padding: 10px;
+				border: 1px solid black;
+				border-collapse: collapse;
+
+			}
+
+			th.SubTable {
+				padding: 10px;
+				border: 1px solid black;
+
+			}
+
+			td.SubTable {
+				padding: 5px;
+				border: 1px solid black;
+				vertical-align: top;
+  			/*text-align: left;*/
+
+			}
+
+		</style>
+
+	</head>
+
+	<body onload=CalculateTN() >
+		<center>
+			<table class=LayoutControl>
+				<tbody>
+					<tr>
+						<th colspan=3>
+							<hr>
+							Melee Combat TN Calculator
+							<hr>
+						</th>
+					</tr>
+					<tr>
+						<td colspan=3>
+							<center>Follow each of the sections below to calculate your target number for melee combat.
+						</td>
+					</tr>
+					<tr>
+						<td colspan=3>
+							<hr>
+							<center><b>Target Number
+							<hr>
+						</td>
+					</tr>
+					<tr>
+						<td colspan=3>
+							<center><input readonly size=1 id=outputTN1 />
+						</td>
+					</tr>
+					<tr>
+						<th colspan=3>
+							<hr>
+							Ranged Combat Modifiers
+							<hr>
+						</th>
+					</tr>
+					<tr>
+						<td>
+							<input type=checkbox id=cb_calledshot onclick=CalculateTN()> <div class=tooltip>Called Shot<span class=tooltiptext>A character can only make a called shot with weapons that fire in single-shot, semi-automatic and burst-fire modes. Calling the shot is a Free Action. When a shot is called, either of the following may occur.<ul><li>The Damage Code is increased by one level (L becomes M, M becomes S, and so on, up to a maximum of D). The character also must apply a +4 modifier to the target number for the shot. </li><li>The character may hit a specific sub-target on something vehicle-sized or larger, such as a vehicle’s windows or tires. Normal damage rules apply against the specific part of the vehicle.</li></ul>See Called Shots and External Components, SR3 p149.</span></div>
+						</td>
+						<td>
+						</td>
+						<td>
+							<center>+4
+						</td>
+					</tr>
+					<tr>
+						<td>
+							<input type=checkbox id=cb_superiorposition onclick=CalculateTN()> <div class=tooltip>Attacker has Superior Position<span class=tooltiptext>A character has a superior position if he or she is standing on higher ground (by at least half a meter) than his or her opponent, if he is standing on stable ground while the opponent is not, or if the opponent is in a restricted position and the character is not.</span></div>
+						</td>
+						<td>
+						</td>
+						<td>
+							<center>-1
+						</td>
+					</tr>
+					<tr>
+						<td>
+							<input type=checkbox id=cb_opponentprone onclick=CalculateTN()> Target Prone
+						</td>
+						<td>
+						</td>
+						<td>
+							<center>-2
+						</td>
+					</tr>
+					<tr>
+						<td colspan=3>
+							<hr>
+							<center>
+							<b>Other Modifiers</b>
+							<hr>
+						</td>
+					</tr>
+					<tr>
+						<td colspan=3>
+							<input type=number id=ib_othermodifiers value=0 size=2 min=-100 max=100 onchange=CalculateTN() onclick=CalculateTN() />
+						</td>
+					</tr>
+					<tr>
+						<td colspan=3>
+							<hr>
+							<center>
+							<b>Wounds</b>
+							<hr>
+						</td>
+					</tr>
+					<tr>
+						<td>
+							<input type=number id=ib_stundamage value=0 size=2 min=0 max=100 onchange=CalculateTN() onclick=CalculateTN() /> Stun Damage
+						</td>
+					</tr>
+					<tr>
+						<td>
+							<input type=number id=ib_physicaldamage value=0 size=2 min=0 max=100 onchange=CalculateTN() onclick=CalculateTN() /> Physical Damage
+						</td>
+					</tr>
+					<tr>
+						<td colspan=3>
+							<hr>
+							<center>
+							<b>Allies/Enemies in Melee</b>
+							<hr>
+						</td>
+					</tr>
+					<tr>
+						<td colspan=3>
+							<input type=number id=ib_friendsinmelee value=0 size=2 min=0 max=20 onchange=CalculateTN() onclick=CalculateTN() /> Allies
+						</td>
+					</tr>
+					<tr>
+						<td>
+							<input type=number id=ib_opponentsinmelee value=0 size=2 min=0 max=20 onchange=CalculateTN() onclick=CalculateTN() /> Enemies
+						</td>
+					</tr>
+					<tr>
+						<td colspan=3>
+								<hr>
+								<center><div class=tooltip><b>Number of Targets</b><span class=tooltiptext>Characters may attack more than one opponent with a Complex Action. Each attack uses the attacking character’s base Combat Skill dice, plus dice from the Combat Pool if desired. The target number for each attack increases by +2 per additional target struck in that Combat Phase. If a character is attempting to strike two targets, for example, the first attack is at the base target number, the second at the base number +2. <p>Dice from the Combat Pool must be allocated separately for each attack.</span></div>
+								<hr>
+						</td>
+					</tr>
+					<tr>
+						<td>
+							<input id=ib_numberoftargets type=number value=1 size=1 min=1 max=100 onchange=CalculateTN() />
+						</td>
+					</tr>
+					<tr>
+						<td colspan=3>
+							<hr>
+							<center>
+							<div class=tooltip>
+								<b>Reach</b>
+								<span class=tooltiptext>
+									Reach indicates how long a weapon is and provides a bonus to the wielder. First, calculate the difference between the Reach Ratings of opponents. The character with the longer (higher) Reach can choose to apply this number as either a negative target number modifier to his attack test OR as a positive modifier to his opponent’s target number. This reflects the ability of a character to use the reach of his weapon to beat the opponent’s defenses or make himself harder to hit. For example, an opponent with a sword (Reach 1) could apply a –1 target modifier to his attack tests against an unarmed opponent. Or, he could choose to add a +1 target number modifier to his opponent’s attack test. Trolls have a natural Reach of 1 that is cumulative with weapon Reach.
+								</span>
+							</div>
+							<hr>
+						</td>
+					</tr>
+					<tr>
+						<td>
+							<input type=number id=ib_attackerreach value=0 size=2 min=0 max=20 onchange=CalculateTN() onclick=CalculateTN() /> Attacker Reach
+						</td>
+					</tr>
+					<tr>
+						<td>
+							<input type=number id=ib_defenderreach value=0 size=2 min=0 max=20 onchange=CalculateTN() onclick=CalculateTN() /> Defender Reach
+						</td>
+					</tr>
+					<tr>
+						<td>
+							<input type=radio id=rd_attacker_enhance value=rd_attacker_enhance name=radio_reachoption value=0 onclick=CalculateTN() checked=checked /> Use Reach to Enhance Attack
+						</td>
+					</tr>
+					<tr>
+						<td>
+							<input type=radio id=rd_attacker_inhibit_defender value=rd_attacker_inhibit_defender name=radio_reachoption value=0 onclick=CalculateTN() /> Use Reach to Inhibit Target
+						</td>
+					</tr>
+					<tr>
+						<td>
+							<input type=radio id=rd_defender_inhibit_attacker value=rd_defender_inhibit_attacker name=radio_reachoption value=0 onclick=CalculateTN() /> Inhibited by Target
+						</td>
+					</tr>
+					<tr>
+						<td>
+							<input type=radio id=rd_defender_enhance_attack value=rd_defender_enhance_attack name=radio_reachoption value=0 onclick=CalculateTN() /> Target's Counterattack Enhanced
+						</td>
+					</tr>
+					<tr>
+						<td colspan=3>
+							<center>
+							<hr>
+							<b>Visibility</b>
+							<hr>
+						</td>
+					</tr>
+					<tr>
+						<td colspan=3>
+							<table class=SubTable>
+								<tbody>
+									<tr>
+										<td class=SubTable rowspan=2>
+											<center>
+											<b>Vision</b>
+											<p><b>Type</b>
+										</td>
+										<td class=SubTable>
+											<center>
+											<b>Normal</b>
+										</td>
+										<td class=SubTable>
+											<center>
+											<b>Low-Light</b>
+											<p><b>Augmented</b>
+										</td>
+										<td class=SubTable>
+											<center>
+											<b>Low-Light</b>
+											<p><b>Natural</b>
+										</td>
+										<td class=SubTable>
+											<center>
+											<b>Thermographic</b>
+											<p><b>Augmented</b>
+										</td>
+										<td class=SubTable>
+											<center>
+											<b>Thermographic</b>
+											<p><b>Natural</b>
+										</td>
+									</tr>
+									<tr>
+										<td class=SubTable>
+											<center>
+											<input type=radio id=visibilityvisionnormal name=radio_visibility_visiontype value=0 onclick=CalculateTN() checked=checked />
+										</td>
+										<td class=SubTable>
+											<center>
+											<input type=radio id=visibilityvisionlowlightaugmented name=radio_visibility_visiontype value=1 onclick=CalculateTN() />
+										</td>
+										<td class=SubTable>
+											<center>
+											<input type=radio id=visibilityvisionlowlightnatural name=radio_visibility_visiontype value=2 onclick=CalculateTN() />
+										</td>
+										<td class=SubTable>
+											<center>
+											<input type=radio id=visibilityvisionthermographicaugmented name=radio_visibility_visiontype value=3 onclick=CalculateTN() />
+										</td>
+										<td class=SubTable>
+											<center>
+											<input type=radio id=visibilityvisionthermographicnatural name=radio_visibility_visiontype value=4 onclick=CalculateTN() />
+										</td>
+									</tr>
+									<tr>
+										<td class=SubTable>
+											<input type=radio id=visibilityconditionnormal checked=checked name=radio_visibility_condition value=0 onclick=CalculateTN() />
+											<b> Normal</b>
+										</td>
+										<td class=SubTable>
+											<center>+0
+										</td>
+										<td class=SubTable>
+											<center>+0
+										</td>
+										<td class=SubTable>
+											<center>+0
+										</td>
+										<td class=SubTable>
+											<center>+0
+										</td>
+										<td class=SubTable>
+											<center>+0
+										</td>
+									</tr>
+									<tr>
+										<td class=SubTable>
+											<input type=radio id=visibilityconditionfulldarkness name=radio_visibility_condition value=1 onclick=CalculateTN() />
+											<b> Full Darkness</b>
+										</td>
+										<td class=SubTable>
+											<center>+8
+										</td>
+										<td class=SubTable>
+											<center>+8
+										</td>
+										<td class=SubTable>
+											<center>+8
+										</td>
+										<td class=SubTable>
+											<center>+4
+										</td>
+										<td class=SubTable>
+											<center>+2
+										</td>
+									</tr>
+									<tr>
+										<td class=SubTable>
+											<input type=radio id=visibilityconditionminimallight name=radio_visibility_condition value=2 onclick=CalculateTN() />
+											<b> Minimal Light</b>
+										</td>
+										<td class=SubTable>
+											<center>+6
+										</td>
+										<td class=SubTable>
+											<center>+4
+										</td>
+										<td class=SubTable>
+											<center>+2
+										</td>
+										<td class=SubTable>
+											<center>+4
+										</td>
+										<td class=SubTable>
+											<center>+2
+										</td>
+									</tr>
+									<tr>
+										<td class=SubTable>
+											<input type=radio id=visibilityconditionpartiallight name=radio_visibility_condition value=3 onclick=CalculateTN() />
+											<b> Partial Light</b>
+										</td>
+										<td class=SubTable>
+											<center>+2
+										</td>
+										<td class=SubTable>
+											<center>+1
+										</td>
+										<td class=SubTable>
+											<center>+0
+										</td>
+										<td class=SubTable>
+											<center>+2
+										</td>
+										<td class=SubTable>
+											<center>+1
+										</td>
+									</tr>
+									<tr>
+										<td class=SubTable>
+											<input type=radio id=visibilityconditionglare name=radio_visibility_condition value=4 onclick=CalculateTN() />
+											<b> Glare</b>
+										</td>
+										<td class=SubTable>
+											<center>+2
+										</td>
+										<td class=SubTable>
+											<center>+4
+										</td>
+										<td class=SubTable>
+											<center>+2
+										</td>
+										<td class=SubTable>
+											<center>+4
+										</td>
+										<td class=SubTable>
+											<center>+2
+										</td>
+									</tr>
+									<tr>
+										<td class=SubTable>
+											<input type=radio id=visibilityconditionmist name=radio_visibility_condition value=5 onclick=CalculateTN() />
+											<b> Mist</b>
+										</td>
+										<td class=SubTable>
+											<center>+2
+										</td>
+										<td class=SubTable>
+											<center>+4
+										</td>
+										<td class=SubTable>
+											<center>+2
+										</td>
+										<td class=SubTable>
+											<center>+4
+										</td>
+										<td class=SubTable>
+											<center>+2
+										</td>
+									</tr>
+									<tr>
+										<td class=SubTable>
+											<input type=radio name=radio_visibility_condition value=6 onclick=CalculateTN() />
+											<b> Light Smoke/Fog/Rain</b>
+										</td>
+										<td class=SubTable>
+											<center>+4
+										</td>
+										<td class=SubTable>
+											<center>+4
+										</td>
+										<td class=SubTable>
+											<center>+2
+										</td>
+										<td class=SubTable>
+											<center>+0
+										</td>
+										<td class=SubTable>
+											<center>+0
+										</td>
+									</tr>
+									<tr>
+										<td class=SubTable>
+											<input type=radio name=radio_visibility_condition value=7 onclick=CalculateTN() />
+											<b> Heavy Smoke/Fog/Rain</b>
+										</td>
+										<td class=SubTable>
+											<center>+6
+										</td>
+										<td class=SubTable>
+											<center>+6
+										</td>
+										<td class=SubTable>
+											<center>+4
+										</td>
+										<td class=SubTable>
+											<center>+1
+										</td>
+										<td class=SubTable>
+											<center>+0
+										</td>
+									</tr>
+									<tr>
+										<td class=SubTable>
+											<input type=radio name=radio_visibility_condition value=8 onclick=CalculateTN() />
+											<b> Thermal Smoke</b>
+										</td>
+										<td class=SubTable>
+											<center>+4
+										</td>
+										<td class=SubTable>
+											<center>+4
+										</td>
+										<td class=SubTable>
+											<center>+4
+										</td>
+										<td class=SubTable>
+											<center>+8
+										</td>
+										<td class=SubTable>
+											<center>+6
+										</td>
+									</tr>
+								</tbody>
+							</table>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		</center>
+	</body>
+</html>
