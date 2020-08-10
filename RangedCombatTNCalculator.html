@@ -1,0 +1,1654 @@
+<html>
+	<head>
+		<title>Ranged Combat Calculator</title>
+		<script>
+
+			var debugmode = false;
+
+			function GetSelectedRadio( radiosetname ) {
+				var radios = document.getElementsByName( radiosetname);
+				for (var i = 0, length = radios.length; i < length; i++) {
+				  if (radios[i].checked) {
+				    return radios[i];
+				    break;
+				  }
+				}
+			}
+
+			function debugalert( text ) {
+				if( debugmode == true ) {
+					alert(text);
+				}
+			}
+
+			function WeaponSelected() {
+
+				var weaponclass = document.getElementById("inputWeaponClass").value;
+				var minimum = 0;
+				var short = 0;
+				var medium = 0;
+				var long = 0;
+				var extreme = 0;
+				var longrangeTN = 6;
+				var strength = document.getElementById("inputCharacterStrength").value;
+
+				switch(weaponclass) {
+					case "selectaweapon":
+						short=0;
+						medium=0;
+						long=0;
+						extreme=0;
+						break;
+
+					case "holdoutpistol":
+						short=5;
+						medium=15;
+						long=30;
+						extreme=50;
+						break;
+
+					case "lightpistol":
+						short=5;
+						medium=15;
+						long=30;
+						extreme=50;
+						break;
+
+					case "heavypistol":
+						short=5;
+						medium=20;
+						long=40;
+						extreme=60;
+						break;
+
+					case "smg":
+						short=10;
+						medium=40;
+						long=80;
+						extreme=150;
+						break;
+
+					case "taser":
+						short=5;
+						medium=10;
+						long=12;
+						extreme=5;
+						break;
+
+					case "shotgun":
+						short=10;
+						medium=20;
+						long=50;
+						extreme=100;
+						break;
+
+					case "sportingrifle":
+						short=100;
+						medium=250;
+						long=500;
+						extreme=750;
+						break;
+
+					case "sniperrifle":
+						short=150;
+						medium=300;
+						long=700;
+						extreme=1000;
+						break;
+
+					case "assaultrifle":
+						short=50;
+						medium=150;
+						long=350;
+						extreme=550;
+						break;
+
+					case "lightmachinegun":
+						short=75;
+						medium=200;
+						long=400;
+						extreme=800;
+						break;
+
+					case "mediummachinegun":
+						short=80;
+						medium=250;
+						long=750;
+						extreme=1200;
+						break;
+
+					case "heavymachinegun":
+						short=80;
+						medium=250;
+						long=800;
+						extreme=1500;
+						break;
+
+					case "assaultcannon":
+						short=100;
+						medium=300;
+						long=900;
+						extreme=2400;
+						break;
+
+					case "grenadelauncher":
+						minimum=5;
+						short=50;
+						medium=100;
+						long=150;
+						extreme=300;
+						longrangeTN=8;
+						break;
+
+					case "missilelauncher":
+						minimum=20;
+						short=150;
+						medium=450;
+						long=1200;
+						extreme=3000;
+						break;
+
+					case "bow":
+						short=parseInt(strength);
+						medium=parseInt(strength)*10;
+						long=parseInt(strength)*30;
+						extreme=parseInt(strength)*60;
+						break;
+
+					case "lightcrossbow":
+						short=parseInt(strength)*2;
+						medium=parseInt(streingth)*8;
+						long=parseInt(streingth)*20;
+						extreme=parseInt(strength)*40;
+						break;
+
+					case "mediumcrossbow":
+						short=parseInt(strength)*3;
+						medium=parseInt(strength)*12;
+						long=parseInt(strength)*30;
+						extreme=parseInt(strength)*50;
+						break;
+
+					case "heavycrossbow":
+						short=parseInt(strength)*5;
+						medium=parseInt(strength)*15;
+						long=parseInt(strength)*40;
+						extreme=parseInt(strength)*60;
+						break;
+
+					case "thrownknife":
+						short=parseInt(strength);
+						medium=parseInt(strength)*2;
+						long=parseInt(strength)*3;
+						extreme=parseInt(strength)*5;
+						break;
+
+					case "shuriken":
+						short=parseInt(strength);
+						medium=parseInt(strength)*2;
+						long=parseInt(strength)*5;
+						extreme=parseInt(strength)*7;
+						break;
+
+					case "elementalmanipulation":
+						short = 99999;
+						medium = 10000;
+						long=10001;
+						extreme=10002;
+						break;
+				}
+
+				if(minimum > 0) {
+					document.getElementById("weaponshortrange").innerHTML = minimum + "-" + short;
+				} else {
+					document.getElementById("weaponshortrange").innerHTML = short;
+				}
+
+				document.getElementById("weaponmediumrange").innerHTML = medium;
+				document.getElementById("weaponlongrange").innerHTML = long;
+				document.getElementById("weaponextremerange").innerHTML = extreme;
+				document.getElementById("weaponlongrangeTN").innerHTML = longrangeTN;
+
+
+				/**************************************************************************
+				*
+				* Checkbox Modifiers
+				*
+				***************************************************************************/
+
+				var blindfiremodifier = 0;
+				var partialcovermodifier = 0;
+				var secondfirearmmodifier = 0;
+				var calledshotmodifier = 0;
+				var heavyweaponmultiplier = 1;
+
+
+				if(document.getElementById("cbblindfire").checked) {
+					blindfiremodifier = 8;
+				}
+
+				if(document.getElementById("cbpartialcover").checked) {
+					partialcovermodifier = 4;
+				}
+
+				if(document.getElementById("cbsecondfirearm").checked) {
+					secondfirearmmodifier = 2;
+				}
+
+				if(document.getElementById("cbcalledshot").checked) {
+					calledshotmodifier = 4;
+				}
+
+				if(document.getElementById("cbheavyweapon").checked) {
+					heavyweaponmultiplier = 2;
+				} else {
+					heavyweaponmultiplier = 1;
+				}
+
+
+				/**************************************************************************
+				*
+				* Firing Mode
+				*
+				***************************************************************************/
+
+				var firingmodeindex = GetSelectedRadio("firingmode").value;
+
+				var firingmodemodifier = 0;
+
+				switch(parseInt(firingmodeindex)) {
+
+					case 0:
+						firingmodemodifier = 0;
+						break;
+
+					case 1:
+						firingmodemodifier = 1;
+						break;
+
+					case 2:
+						firingmodemodifier = 3;
+						break;
+
+					case 3:
+						firingmodemodifier = 6;
+						break;
+
+					case 4:
+						firingmodemodifier = document.getElementById("fullautoshotsfired").value;
+						break;
+
+					case 3:
+						firingmodemodifier = 6;
+						break;
+
+					case 3:
+						firingmodemodifier = 12;
+						break;
+
+					case 3:
+						firingmodemodifier = 18;
+						break;
+
+					case 5:
+						firingmodemodifier = document.getElementById("ingramsupermachfullautoshotsfired").value;
+						break;
+
+				}
+
+				/**************************************************************************
+				*
+				* Tracer Rounds Fired
+				*
+				***************************************************************************/
+
+
+				var tracerroundsmodifier = document.getElementById("tracerroundsfired").value * -1;
+
+				/**************************************************************************
+				*
+				* Number of Targets
+				*
+				***************************************************************************/
+
+				var numberoftargetsmodifier = (document.getElementById("numberoftargets").value - 1) * 2;
+
+
+
+				/**************************************************************************
+				*
+				* Number of Aim Actions Taken
+				*
+				***************************************************************************/
+
+				var aimactionsmodifier = document.getElementById("numberofaimactionstaken").value * -1;
+
+
+
+				/**************************************************************************
+				*
+				* Accessories
+				*
+				***************************************************************************/
+
+				var accessoriesmodifier = 0;
+
+				var accessoriesindex = GetSelectedRadio("weaponaccessory").value;
+
+				var accessorieslasersightmodifier = 0;
+
+				var magnificationmodifier = 0;
+
+				var lasersightchecked = document.getElementById("accessorylasersight").checked;
+
+				var targetrange = document.getElementById("inputRangeFromTarget").value;
+
+				if(targetrange < 51 && lasersightchecked) {
+					accessorieslasersightmodifier = -1;
+				}
+
+				switch(parseInt(accessoriesindex)) {
+					case 0:
+						accessoriesmodifier=0;
+						break;
+
+					case 1: //smart link
+						accessoriesmodifier = -2;
+						break;
+
+					case 2: //smart goggles
+						accessoriesmodifier = -1;
+						break;
+
+					case 3: //magnfication 1
+						magnificationmodifier = -1;
+						break;
+
+					case 4: //magnification 2
+						magnificationmodifier = -2;
+						break;
+
+					case 5: //magnification 3
+						magnificationmodifier = -3;
+						break;
+
+				}
+				/**************************************************************************
+				*
+				* Attacker Movement Modifier
+				*
+				***************************************************************************/
+
+				var attackermovementtable = [
+					0, 1, 2, 4, 6
+				];
+
+				var attackermovementindex = GetSelectedRadio("attackermovement").value;
+				var attackermovementmodifier = attackermovementtable[attackermovementindex];
+
+
+
+				/**************************************************************************
+				*
+				* Target Movement Modifier
+				*
+				***************************************************************************/
+
+				var targetmovementtable = [
+					-1, 0, 2
+				];
+
+				var targetmovementindex = GetSelectedRadio("targetmovement").value;
+				var targetmovementmodifier = targetmovementtable[targetmovementindex];
+
+
+
+				/**************************************************************************
+				*
+				* Visibility Table
+				*
+				***************************************************************************/
+
+				var visibilitytable = [
+					[ 0, 0, 0, 0, 0 ],
+					[ 8, 8, 8, 4, 2 ],
+					[ 6, 4, 2, 4, 2 ],
+					[ 2, 1, 0, 2, 1 ],
+					[ 2, 4, 2, 4, 2 ],
+					[ 2, 4, 2, 4, 2 ],
+					[ 4, 4, 2, 0, 0 ],
+					[ 6, 6, 4, 1, 0 ],
+					[ 4, 4, 4, 8, 6 ]
+				];
+
+				var condition = GetSelectedRadio("visibilitycondition").value;
+				var vision = GetSelectedRadio("visibilityvision").value;
+
+				var visibilitymodifier = visibilitytable[condition][vision];
+
+
+
+				/**************************************************************************
+				*
+				* Range TN including magnification
+				*
+				***************************************************************************/
+				//something wrong with this section
+
+				var rangeTNs = [
+					4, 5, longrangeTN, 9
+				];
+
+				var rangeTNindex = 0;
+
+				if(targetrange <= short) {
+					rangeTNindex = 0;
+					rangeTNindex = parseInt(rangeTNindex) + parseInt(magnificationmodifier);
+
+				} else if(parseInt(targetrange) <= parseInt(medium)) {
+					rangeTNindex = 1;
+					rangeTNindex = parseInt(rangeTNindex) + parseInt(magnificationmodifier);
+				} else if(parseInt(targetrange) <= parseInt(long)) {
+					rangeTNindex = 2;
+					rangeTNindex = parseInt(rangeTNindex) + parseInt(magnificationmodifier);
+				} else if(parseInt(targetrange) <= parseInt(extreme)) {
+					rangeTNindex = 3;
+					rangeTNindex = parseInt(rangeTNindex) + parseInt(magnificationmodifier);
+				} else {
+
+				}
+
+				if(rangeTNindex < 0) {
+					rangeTNindex = 0;
+				}
+
+				if(rangeTNindex > 3) {
+					rangeTNindex = 3;
+				}
+
+				var baseTN = rangeTNs[rangeTNindex];
+
+				/**************************************************************************
+				*
+				* Recoil Modifier and gyrostabilization
+				*
+				***************************************************************************/
+
+				var gyrostabilizationmodifier = document.getElementById("gyrostabilization").value * -1;
+				var recoilcompensationmodifier = document.getElementById("recoilcompensation").value * -1;
+
+				debugalert("gyrostabilizationmodifier: " + gyrostabilizationmodifier + "\nrecoilcompensationmodifier: " + recoilcompensationmodifier);
+				var uncompensatedrecoil = parseInt(firingmodemodifier) + parseInt(recoilcompensationmodifier) + parseInt(gyrostabilizationmodifier);
+				if(uncompensatedrecoil < 0) {
+					uncompensatedrecoil = 0;
+				}
+
+				var uncompensatedmovementmodifier = parseInt(attackermovementmodifier) + parseInt(gyrostabilizationmodifier);
+				if(uncompensatedmovementmodifier < 0) {
+					uncompensatedmovementmodifier = 0;
+				}
+
+				var recoilmodifier = (parseInt(uncompensatedrecoil) * parseInt(heavyweaponmultiplier)) + uncompensatedmovementmodifier;
+				debugalert("uncompensatedrecoil: " + uncompensatedrecoil + "\nheavyweaponmultiplier: " + heavyweaponmultiplier + "\nuncompensatedmovementmodifier: " + uncompensatedmovementmodifier);
+				if(recoilmodifier < 0) {
+					recoilmodifier = 0;
+				}
+
+
+
+				/**************************************************************************
+				*
+				* Wounds Modifier
+				*
+				***************************************************************************/
+
+				var woundsmodifier = 0;
+
+			 	var stundamage = document.getElementById("stundamagetaken").value;
+				var physicaldamage = document.getElementById("physicaldamagetaken").value;
+				var stundamagemodifier = 0;
+				var physicaldamagemodifier = 0;
+
+				if( stundamage < 1 ) {
+					stundamagemodifier = 0;
+				} else if( stundamage < 3 ) {
+					stundamagemodifier = 1;
+				} else if( stundamage < 6 ) {
+					stundamagemodifier = 2;
+				} else {
+					stundamagemodifier = 3;
+				}
+
+				if( physicaldamage < 1 ) {
+					physicaldamagemodifier = 0;
+				} else if( physicaldamage < 3 ) {
+					physicaldamagemodifier = 1;
+				} else if( physicaldamage < 6 ) {
+					physicaldamagemodifier = 2;
+				} else {
+					physicaldamagemodifier = 3;
+				}
+
+				woundsmodifier = physicaldamagemodifier + stundamagemodifier;
+
+				/**************************************************************************
+				*
+				* Miscellaneous Modifier
+				*
+				***************************************************************************/
+
+				var othermodifiers = document.getElementById("othermodifiers").value;
+
+				/**************************************************************************
+				*
+				* Calculate TN
+				*
+				***************************************************************************/
+
+				var finalTN = 0;
+
+				debugalert("BaseTN: " + baseTN + "\n"
+				+ "blindfiremodifier: " + blindfiremodifier + "\n"
+				+ "partialcovermodifier: " + partialcovermodifier + "\n"
+				+ "secondfirearmmodifier: " + secondfirearmmodifier + "\n"
+				+ "calledshotmodifier: " + calledshotmodifier + "\n"
+				+ "recoilmodifier: " + recoilmodifier + "\n"
+				+ "tracerroundsmodifier: " + tracerroundsmodifier + "\n"
+				+ "numberoftargetsmodifier: " + numberoftargetsmodifier + "\n"
+				+ "aimactionsmodifier: " + aimactionsmodifier + "\n"
+				+ "accessoriesmodifier: " + accessoriesmodifier + "\n"
+				+ "accessorieslasersightmodifier: " + accessorieslasersightmodifier + "\n"
+				+ "targetmovementmodifier: " + targetmovementmodifier + "\n"
+				+ "visibilitymodifier: " + visibilitymodifier + "\n"
+				+ "woundsmodifier: " + woundsmodifier + "\n") + "\n"
+				+ "othermodifiers: " + othermodifiers;
+
+
+				finalTN = parseInt(baseTN)
+				+ parseInt(blindfiremodifier)
+				+ parseInt(partialcovermodifier)
+				+ parseInt(secondfirearmmodifier)
+				+ parseInt(calledshotmodifier)
+				+ parseInt(recoilmodifier)
+				+ parseInt(tracerroundsmodifier)
+				+ parseInt(numberoftargetsmodifier)
+				+ parseInt(aimactionsmodifier)
+				+ parseInt(accessoriesmodifier)
+				+ parseInt(accessorieslasersightmodifier)
+				+ parseInt(targetmovementmodifier)
+				+ parseInt(visibilitymodifier)
+				+ parseInt(woundsmodifier)
+				+ parseInt(othermodifiers);
+
+				document.getElementById("outputTN1").value = finalTN;
+				document.getElementById("outputTN2").value = finalTN;
+
+			}
+		</script>
+
+		<style>
+
+			/**************************************************************************/
+			/*
+			/* Default Formatting
+			/*
+			/**************************************************************************/
+
+			.tooltip {
+			  position: relative;
+			  display: inline-block;
+			  border-bottom: 1px dotted black; /* If you want dots under the hoverable text */
+			}
+
+			/* Tooltip text */
+			.tooltip .tooltiptext {
+			  visibility: hidden;
+			  width: 240px;
+			  background-color: black;
+			  color: #fff;
+			  text-align: center;
+			  padding: 5px 0;
+			  border-radius: 6px;
+
+			  /* Position the tooltip text - see examples below! */
+			  position: absolute;
+			  z-index: 1;
+			}
+
+			/* Show the tooltip text when you mouse over the tooltip container */
+			.tooltip:hover .tooltiptext {
+			  visibility: visible;
+			}
+
+			input:focus {
+	  		border: 1px solid #555;
+				background-color: #EEEEEE;
+			}
+
+			input:read-only {
+				background-color: #BBBBBB;
+				color: #000000;
+			}
+
+			input {
+    		text-align: center;
+			}
+
+			body {
+				background-color:black;
+			}
+			table {
+				background-color:white;
+				vertical-align: top;
+			}
+			th {
+				vertical-align: top;
+			}
+			td {
+				vertical-align: top;
+				/*text-align: left;*/
+			}
+			/**************************************************************************/
+			/*
+			/* Layout Control Table
+			/*
+			/**************************************************************************/
+
+			table.LayoutControl {
+				border: 1px solid black;
+				padding: 10px;
+				border-radius:12px;
+				width:1px;
+			}
+
+			tr:hover.LayoutControl {
+				background-color: #EEEEEE;
+			}
+
+			th.LayoutControl {
+		   	font-variant: small-caps;
+				padding:12px;
+				text-align:center;
+			}
+
+			td.LayoutControl {
+				padding-right: 8px;
+			}
+
+			input:focus.LayoutControl {
+	  		border: 1px solid #555;
+				background-color: #EEEEEE;
+			}
+
+			input:read-only.LayoutControl {
+				background-color: #BBBBBB;
+				color: #000000;
+			}
+
+			button.LayoutControl {
+				box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2), 0 6px 10px 0 rgba(0,0,0,0.19);
+			}
+
+			button:hover.LayoutControl {
+  			box-shadow: 0 4px 8px 0 rgba(0,0,0,0.24), 0 6px 10px 0 rgba(0,0,0,0.19);
+			}
+
+			/**************************************************************************/
+			/*
+			/* Sub Table
+			/*
+			/**************************************************************************/
+
+			table.SubTable {
+				padding: 10px;
+				border: 1px solid black;
+				border-collapse: collapse;
+
+			}
+
+			th.SubTable {
+				padding: 10px;
+				border: 1px solid black;
+
+			}
+
+			td.SubTable {
+				padding: 5px;
+				border: 1px solid black;
+				vertical-align: top;
+  			/*text-align: left;*/
+
+			}
+
+		</style>
+	</head>
+	<body onload=WeaponSelected() >
+		<center>
+			<table class=LayoutControl>
+				<tbody>
+					<tr>
+						<th colspan=3>
+							<hr>
+							Ranged Combat Calculator
+							<hr>
+						</th>
+					</tr>
+					<tr>
+						<td colspan=3>
+							<center>Follow each of the sections below to calculate your target number for ranged combat.
+						</td>
+					</tr>
+					<tr>
+						<td colspan=3>
+							<hr>
+							<center><b>Target Number
+							<hr>
+						</td>
+					</tr>
+					<tr>
+						<td colspan=3>
+							<center><input readonly size=1 id=outputTN1 />
+						</td>
+					</tr>
+					<tr>
+						<td colspan=3>
+							<center>
+							<hr>
+							<div class="tooltip">
+								<b>Attacker's Strength</b>
+								<span class="tooltiptext">Some weapons like bows and throwing knives calculate range based on strength.</span>
+							</div>
+							<hr>
+						</td>
+					</tr>
+					<tr>
+						<td colspan=3>
+							<center><input id=inputCharacterStrength type=number value=1 size=3 min=1 onchange=WeaponSelected() onload=WeaponSelected() />
+						</td>
+					</tr>
+
+					<tr>
+						<td colspan=3>
+							<hr>
+							<center><b>Weapon Type</b>
+							<div class="tooltip">
+								<span class="tooltiptext">Weapon type dictates base Target Numbers and range increments.</span>
+							</div>
+							<hr>
+						</td>
+					</tr>
+					<tr>
+						<td colspan=3>
+							<center>
+							<select name="weapon" id="inputWeaponClass" onchange=WeaponSelected() onload=WeaponSelected() >
+								<option value="selectaweapon">---</option>
+								<option value="holdoutpistol">Hold-Out Pistol</option>
+								<option value="lightpistol">Light Pistol</option>
+								<option value="heavypistol">Heavy Pistol</option>
+								<option value="smg">SMG</option>
+								<option value="taser">Taser</option>
+								<option value="shotgun">Shotgun</option>
+								<option value="sportingrifle">Sporting Rifle</option>
+								<option value="sniperrifle">Sniper Rifle</option>
+								<option value="assaultrifle">Assault Rifle</option>
+								<option value="lightmachinegun">Light Machine Gun</option>
+								<option value="mediummachinegun">Medium Machine Gun</option>
+								<option value="heavymachinegun">Heavy Machine Gun</option>
+								<option value="assaultcannon">Assault Cannon</option>
+								<option value="grenadelauncher">Grenade Launcher</option>
+								<option value="missilelauncher">Missile Launcher</option>
+								<option value="bow">Bow</option>
+								<option value="lightcrossbow">Light Crossbow</option>
+								<option value="mediumcrossbow">Medium Crossbow</option>
+								<option value="heavycrossbow">Heavy Crossbow</option>
+								<option value="thrownknife">Thrown Knife</option>
+								<option value="shuriken">Shuriken</option>
+								<option value="elementalmanipulation">Elemental Manipulation</option>
+							</select>
+						</td>
+					</tr>
+					<tr>
+						<td colspan=3 align=center style="padding-top: 10px; padding-bottom: 10px; align:center;">
+							<center>
+							<table class=SubTable>
+								<tbody align=center>
+									<tr>
+										<td class=SubTable>
+											<b><p>TN</p></b>
+											<hr>
+											<b><p>Range</p></b>
+										</td>
+										<td class=SubTable>
+											<b><p>4</p>
+											<hr>
+											<p>Short</p></b>
+										</td>
+										<td class=SubTable>
+											<b><p>5</p>
+												<hr>
+											<p>Medium</p></b>
+										</td>
+										<td class=SubTable>
+											<b><p id=weaponlongrangeTN>6</p>
+											<hr>
+											<p>Long</p></b>
+										</td>
+										<td class=SubTable>
+											<b><p>9</p>
+											<hr>
+											<p>Extreme</p></b>
+										</td>
+									</tr>
+									<tr>
+										<td class=SubTable>
+											<b>Meters</b>
+										</td>
+										<td class=SubTable>
+											<p id=weaponshortrange>0</p>
+										</td>
+										<td class=SubTable>
+											<p id=weaponmediumrange>0</p>
+										</td>
+										<td class=SubTable>
+											<p id=weaponlongrange>0</p>
+										</td>
+										<td class=SubTable>
+											<p id=weaponextremerange>0</p>
+										</td>
+								</tbody>
+							</table>
+						</td>
+						<td>
+						</td>
+					</tr>
+					<tr>
+						<td colspan = 3>
+							<hr>
+							<center>
+							<div class="tooltip">
+								<b>Range From Target</b>
+								<span class="tooltiptext">Number of meters from the target.</span>
+							</div>
+							<hr>
+						</td>
+					</tr>
+					<tr>
+						<td colspan=3>
+							<center><input id=inputRangeFromTarget type=number size=5 value=1 min=1 max=99999 onchange=WeaponSelected() />
+						</td>
+					</tr>
+					<tr>
+						<th colspan=3>
+							<hr>
+							Ranged Combat Modifiers
+							<hr>
+						</th>
+					<tr>
+						<td>
+							<input type="checkbox" id="cbblindfire" onclick="WeaponSelected()"><b> Blind Fire</b>
+						</td>
+						<td>
+						</td>
+						<td>
+							<center>+8
+						</td>
+					</tr>
+					<tr>
+						<td>
+							<input type="checkbox" id="cbpartialcover" onclick="WeaponSelected()"><b> Partial Cover</b>
+						</td>
+						<td>
+						</td>
+						<td>
+							<center>+4
+						</td>
+					</tr>
+					<tr>
+						<td>
+							<input type="checkbox" id="cbsecondfirearm" onclick="WeaponSelected()"><b> Using Second Firearm</b>
+						</td>
+						<td>
+						</td>
+						<td>
+							<center>+2
+						</td>
+					</tr>
+					<tr>
+						<td>
+							<input type="checkbox" id="cbcalledshot" onclick="WeaponSelected()"><b> Called Shot</b>
+						</td>
+						<td>
+
+						</td>
+						<td>
+							<center>+4
+						</td>
+					</tr>
+					<tr>
+						<td>
+							<input type="checkbox" id="cbheavyweapon" onclick="WeaponSelected()"><b> Heavy Weapon</b>
+						</td>
+						<td>
+
+						</td>
+						<td>
+							<center>Recoil x2
+						</td>
+					</tr>
+					<tr>
+						<td colspan=3>
+							<hr>
+							<center><b>Firing Mode</b></center>
+							<hr>
+						</td>
+					</tr>
+					<tr>
+						<td>
+							<input type=radio checked=checked id=SAfirstshot name=firingmode value=SAfirstshot onclick=WeaponSelected() />
+							<div class="tooltip">
+								<b><b>Semi-Auto, First Shot</b>
+								<span class="tooltiptext">Semi-automatic weapons that fire a second shot receive a +1 modifier for the second shot only.</span>
+							</div>
+						</td>
+						<td>
+
+						</td>
+						<td>
+							<center>+0
+						</td>
+					</tr>
+					<tr>
+						<td>
+							<input type=radio id=SAsecondshot name=firingmode value=1 onclick=WeaponSelected() />
+							<div class="tooltip">
+								<b><b>Semi-Auto, Second Shot</b>
+								<span class="tooltiptext">Semi-automatic weapons that fire a second shot receive a +1 modifier for the second shot only.</span>
+							</div>
+						</td>
+						<td>
+
+						</td>
+						<td>
+							<center>+1
+						</td>
+					</tr>
+					<tr>
+						<td>
+							<input type=radio id=Burstfirstshot name=firingmode value=2 onclick=WeaponSelected() />
+							<div class="tooltip">
+								<b>Burst, First Burst</b></b>
+								<span class="tooltiptext">Burst-fire weapons receive a +3 recoil modifier for each burst fired in that Combat Phase.<p>Therefore, a character who fires the maximum of two bursts in an action receives a +3 modifier for the first burst and an additional +3 modifier (total of +6) for the second burst.</span>
+							</div>
+						</td>
+						<td>
+
+						</td>
+						<td>
+							<center>+3
+						</td>
+					</tr>
+					<tr>
+						<td>
+							<input type=radio id=Burstfirstshot name=firingmode value=3 onclick=WeaponSelected() />
+							<div class="tooltip">
+								<b>Burst, Second Burst</b></b>
+								<span class="tooltiptext">Burst-fire weapons receive a +3 recoil modifier for each burst fired in that Combat Phase.<p>Therefore, a character who fires the maximum of two bursts in an action receives a +3 modifier for the first burst and an additional +3 modifier (total of +6) for the second burst.</span>
+							</div>
+						</td>
+						<td>
+
+						</td>
+						<td>
+							<center>+6
+						</td>
+					</tr>
+					<tr>
+						<td>
+							<input type=radio id=fullauto name=firingmode value=4 onclick=WeaponSelected() />
+							<div class="tooltip">
+								<b>Full Auto</b>
+								<span class="tooltiptext">Full-autofire weapons add a cumulative +1 modifier for each round fired that Combat Phase. That is, a character choosing to fire a seven-round, full-autofire burst receives a +7 modifier. If that same character chooses instead to fire two five-round full-auto bursts, he would take a +5 modifier for the first burst and a +10 modifier for the second burst (having fired ten rounds). Characters can only counter a recoil modifier with recoil compensation or gyro stabilization (see SR3 p280).</span>
+							</div>
+						</td>
+						<td>
+							<input id=fullautoshotsfired type=number value=3 size=2 min=3 max=10 onchange=WeaponSelected() /> Shots Fired
+						</td>
+						<td>
+							<center>+1 per shot fired
+						</td>
+					</tr>
+					<tr>
+						<td>
+							<input type=radio id=Burst name=firingmode value=5 onclick=WeaponSelected() />
+							<div class="tooltip">
+								<b>Ingram SuperMach Burst, First Burst</b>
+								<span class="tooltiptext">In burst mode, the SuperMach fires 6-round bursts hat inflict 12S damage. These bursts suffer recoil for each bullet in the same way as standard bursts; a single burst incurs a Recoil Modifier of +6 (+3 with compensation), a second burst in the same Combat Phase would suffer +12 (+9).</span>
+							</div>
+						</td>
+						<td>
+
+						</td>
+						<td>
+							<center>+6
+						</td>
+					</tr>
+					<tr>
+						<td>
+							<input type=radio id=Burst name=firingmode value=5 onclick=WeaponSelected() />
+							<div class="tooltip">
+								<b>Ingram SuperMach Burst, Second Burst</b>
+								<span class="tooltiptext">In burst mode, the SuperMach fires 6-round bursts hat inflict 12S damage. These bursts suffer recoil for each bullet in the same way as standard bursts; a single burst incurs a Recoil Modifier of +6 (+3 with compensation), a second burst in the same Combat Phase would suffer +12 (+9).</span>
+							</div>
+						</td>
+						<td>
+
+						</td>
+						<td>
+							<center>+12
+						</td>
+					</tr>
+					<td>
+						<input type=radio id=Burst name=firingmode value=5 onclick=WeaponSelected() />
+						<div class="tooltip">
+							<b>Ingram SuperMach Burst, Third Burst</b>
+							<span class="tooltiptext">In burst mode, the SuperMach fires 6-round bursts hat inflict 12S damage. These bursts suffer recoil for each bullet in the same way as standard bursts; a single burst incurs a Recoil Modifier of +6 (+3 with compensation), a second burst in the same Combat Phase would suffer +12 (+9).</span>
+						</div>
+					</td>
+					<td>
+					</td>
+					<td>
+						<center>+18
+					</td>
+				</tr>
+					<tr>
+						<td>
+							<input type=radio id=Burst name=firingmode value=6 onclick=WeaponSelected() />
+							<div class="tooltip">
+								<b>Ingram Supermach Full Auto</b>
+								<span class="tooltiptext">In full-auto mode, the SuperMach has a maximum rate of 18 rounds per phase. This autofire can be directed in bursts at more than one target, but at least 6 rounds must be fired in each autofire burst (see SR3 p115).</span>
+							</div>
+						</td>
+						<td>
+							<input id=ingramsupermachfullautoshotsfired type=number value=3 size=2 min=3 max=18 onchange=WeaponSelected() /> Shots Fired
+						</td>
+						<td>
+							<center>+1 per shot fired
+						</td>
+					</tr>
+					<tr>
+						<td colspan=3>
+							<hr>
+							<center><b>Tracer Rounds Fired</b></center>
+							<hr>
+						</td>
+					</tr>
+					<tr>
+						<td colspan=3>
+							<center><input id=tracerroundsfired type=number value=0 size=1 min=0 max=18 onchange=WeaponSelected() />
+						</td>
+					</tr>
+					<tr>
+						<td colspan=3>
+								<hr>
+								<center><b>Number of Targets</b>
+								<hr>
+						</td>
+					</tr>
+
+					<tr>
+						<td colspan=3>
+							<center><input id=numberoftargets type=number value=1 size=1 min=1 max=100 onchange=WeaponSelected() />
+						</td>
+					</tr>
+					<tr>
+						<td colspan=3>
+								<hr>
+								<center><b>Aim Actions Taken</b>
+								<hr>
+						</td>
+					</tr>
+
+					<tr>
+						<td colspan=3>
+							<center><input id=numberofaimactionstaken type=number value=0 size=1 min=0 max=100 onchange=WeaponSelected() />
+						</td>
+					</tr>
+					<tr>
+						<td colspan=3>
+							<hr>
+							<center><b>Accessories</b>
+							<hr>
+						</td>
+					</tr>
+					<tr>
+						<td>
+							<input type=radio checked=checked id=accessorynone name=weaponaccessory value=0 onclick=WeaponSelected() />
+							<div class="tooltip">
+								<b> None</b>
+								<span class="tooltiptext"></span>
+							</div>
+						</td>
+						<td>
+						</td>
+						<td>
+							<center>&plusmn;0
+						</td>
+					</tr>
+					<tr>
+						<td>
+							<input type=radio id=accessorysmartlink name=weaponaccessory value=1 onclick=WeaponSelected() />
+							<div class="tooltip">
+								<b> Smart Link</b>
+								<span class="tooltiptext">Smartgun Systems: Available in internal and external versions, the smartgun system provides a feedback circuit relating the gun’s angle of fire to the shooter’s line of sight. The internal smartgun system is built into the gun and doubles the weapon’s cost if installed after manufacturing. The external system mounts on the weapon (top- or underbarrel positions) and can be transferred from weapon to weapon, with one hour of maintenance and alignment. Without a receptor (smart goggles or smartlink), the hardware is dead weight. Using a smartlinked weapon provides a –2 target number modifier for firearms tests.</span>
+							</div>
+						</td>
+						<td>
+						</td>
+						<td>
+							<center>-2
+						</td>
+					</tr>
+					<tr>
+						<td>
+							<input type=radio id=accessorysmartgoggles name=weaponaccessory value=2 onclick=WeaponSelected() />
+							<div class="tooltip">
+								<b>Smart Goggles</b>
+								<span class="tooltiptext">Smart Goggles: This pair of oversized goggles connects by fiber-optic cable to a weapon rigged as a smartgun. The chips in the gun feed into receptors in the goggles, producing red cross hairs in the user’s field of vision, centered on where the gun is pointing. The amount of ammunition remaining also appears in the user’s field of vision.
+								This system may be built into a helmet or, for double the nuyen, rigged as mirrored sunglasses. In addition to simple targeting, smart goggles may be set up for low-light or infrared reception. For low-light or infrared additions, add +1,000¥.</span>
+							</div>
+						</td>
+						<td>
+						</td>
+						<td>
+							<center>-1
+						</td>
+					</tr>
+					<tr>
+						<td>
+							<input type=radio id=accessorymagnification1 name=weaponaccessory value=3 onclick=WeaponSelected() />
+							<div class="tooltip">
+								<b>Magnification Rating 1</b>
+								<span class="tooltiptext">Image Modification Systems These systems change a weapon’s range category by a number equal to the device’s rating. A Rating 2 targeting scope firing at long range, for example, would shift the weapon’s range two places to the left on the Weapon Range Table, changing long range to short range. The base target number, normally 6 for a long-range attack, would drop to 4 for short-range attacks. Because short range is the lowest range possible, the same device used for an attack at medium range could not reduce the range category to less than short range.</span>
+							</div>
+						</td>
+					</tr>
+					<tr>
+						<td>
+							<input type=radio id=accessorymagnification2 name=weaponaccessory value=4 onclick=WeaponSelected() />
+							<div class="tooltip">
+								<b>Magnification Rating 2</b>
+								<span class="tooltiptext">Image Modification Systems These systems change a weapon’s range category by a number equal to the device’s rating. A Rating 2 targeting scope firing at long range, for example, would shift the weapon’s range two places to the left on the Weapon Range Table, changing long range to short range. The base target number, normally 6 for a long-range attack, would drop to 4 for short-range attacks. Because short range is the lowest range possible, the same device used for an attack at medium range could not reduce the range category to less than short range.</span>
+							</div>
+						</td>
+					</tr>
+					<tr>
+						<td>
+							<input type=radio id=accessorymagnification3 name=weaponaccessory value=5 onclick=WeaponSelected() />
+							<div class="tooltip">
+								<b>Magnification Rating 3</b>
+								<span class="tooltiptext">Image Modification Systems These systems change a weapon’s range category by a number equal to the device’s rating. A Rating 2 targeting scope firing at long range, for example, would shift the weapon’s range two places to the left on the Weapon Range Table, changing long range to short range. The base target number, normally 6 for a long-range attack, would drop to 4 for short-range attacks. Because short range is the lowest range possible, the same device used for an attack at medium range could not reduce the range category to less than short range.</span>
+							</div>
+						</td>
+					</tr>
+					<tr>
+						<td>
+							<input type="checkbox" id="accessorylasersight" onclick="WeaponSelected()">
+							<div class="tooltip">
+								<b>Laser Sight</b>
+								<span class="tooltiptext">Laser Sight: This device projects a laser beam to produce a glowing red spot on the target. The sight activates when the user touches the trigger. It provides a –1 target number modifier for firearms tests. Laser sights may not be used with a smartlink system, and are available in underbarrel or top-mounting versions. Mounting a laser sight adds –1 to a weapon’s Concealability Rating, and requires one Complex Action to install or remove.</span>
+							</div>
+						</td>
+						<td>
+						</td>
+						<td>
+							<center>-1
+						</td>
+					</tr>
+					<tr>
+						<td colspan=3>
+							<hr>
+							<center><b>Attacker Movement</b>
+							<hr>
+						</td>
+					</tr>
+					<tr>
+ 						<td>
+							<input type=radio checked=checked id=attackerwalking name=attackermovement value=0 onclick=WeaponSelected() />
+							<b>Stationary</b>
+ 						</td>
+ 						<td>
+ 						</td>
+ 						<td>
+							<center>&plusmn; 0
+ 						</td>
+ 					</tr>
+					<tr>
+						<td>
+							<input type=radio id=attackerwalking name=attackermovement value=1 onclick=WeaponSelected() />
+							<b>Walking</b>
+						</td>
+						<td>
+
+						</td>
+						<td>
+							<center>+1
+						</td>
+					</tr>
+					<tr>
+						<td>
+							<input type=radio id=attackerwalkingdifficultground name=attackermovement value=2 onclick=WeaponSelected() />
+							<b>Walking (Difficult Ground)</b>
+						</td>
+						<td>
+
+						</td>
+						<td>
+							<center>+2
+						</td>
+					</tr>
+					<tr>
+						<td>
+							<input type=radio id=attackerrunning name=attackermovement value=3 onclick=WeaponSelected() />
+							<b>Running</b>
+						</td>
+						<td>
+
+						</td>
+						<td>
+							<center>+4
+						</td>
+					</tr>
+					<tr>
+						<td>
+							<input type=radio id=attackerrunningingdifficultground name=attackermovement value=4 onclick=WeaponSelected() />
+							<b>Running (Difficult Ground)</b>
+						</td>
+						<td>
+
+						</td>
+						<td>
+							<center>+6
+						</td>
+					</tr>
+					<tr>
+						<td colspan=3>
+							<hr>
+							<center><b>Gyrostabilization</b>
+							<hr>
+					</tr>
+					<tr>
+						<td colspan=3>
+							<center><input type=number id=gyrostabilization value=0 size=1 min=0 max=100 onchange=WeaponSelected() />
+						</td>
+					</tr>
+					<tr>
+						<td colspan=3>
+							<hr>
+							<center><b>Recoil Compensation</b>
+							<hr>
+					</tr>
+					<tr>
+						<td colspan=3>
+							<center><input type=number id=recoilcompensation value=0 size=1 min=0 max=100 onchange=WeaponSelected() />
+						</td>
+					</tr>
+					<tr>
+						<td colspan=3>
+							<hr>
+							<center><b>Target Movement</b>
+							<hr>
+						</td>
+					</tr>
+					<tr>
+						<td>
+							<input type=radio checked=checked id=targetstationary name=targetmovement value=0 onclick=WeaponSelected() />
+							<b>Stationary</b>
+						</td>
+						<td>
+						</td>
+						<td>
+							<center>-1
+						</td>
+					</tr>
+					<tr>
+						<td>
+							<input type=radio checked=checked id=targetwalking name=targetmovement value=1 onclick=WeaponSelected() />
+							<b>Walking</b>
+						</td>
+						<td>
+						</td>
+						<td>
+							<center>&plusmn;0
+						</td>
+					</tr>
+					<tr>
+						<td>
+							<input type=radio id=targetrunning name=targetmovement value=2 onclick=WeaponSelected() />
+							<b>Running</b>
+						</td>
+						<td>
+
+						</td>
+						<td>
+							<center>+2
+						</td>
+					</tr>
+					<tr>
+						<td colspan=3>
+							<center>
+							<hr>
+							<b>Visibility</b>
+							<hr>
+						</td>
+					</tr>
+					<tr>
+						<td colspan=3>
+							<table class=SubTable>
+								<tbody>
+									<tr>
+										<td class=SubTable rowspan=2>
+											<center>
+											<b>Vision</b>
+											<p><b>Type</b>
+										</td>
+										<td class=SubTable>
+											<center>
+											<b>Normal</b>
+										</td>
+										<td class=SubTable>
+											<center>
+											<b>Low-Light</b>
+											<p><b>Augmented</b>
+										</td>
+										<td class=SubTable>
+											<center>
+											<b>Low-Light</b>
+											<p><b>Natural</b>
+										</td>
+										<td class=SubTable>
+											<center>
+											<b>Thermographic</b>
+											<p><b>Augmented</b>
+										</td>
+										<td class=SubTable>
+											<center>
+											<b>Thermographic</b>
+											<p><b>Natural</b>
+										</td>
+									</tr>
+									<tr>
+										<td class=SubTable>
+											<center>
+											<input type=radio id=visibilityvisionnormal checked=checked name=visibilityvision value=0 onclick=WeaponSelected() />
+										</td>
+										<td class=SubTable>
+											<center>
+											<input type=radio id=visibilityvisionlowlightaugmented name=visibilityvision value=1 onclick=WeaponSelected() />
+										</td>
+										<td class=SubTable>
+											<center>
+											<input type=radio id=visibilityvisionlowlightnatural name=visibilityvision value=2 onclick=WeaponSelected() />
+										</td>
+										<td class=SubTable>
+											<center>
+											<input type=radio id=visibilityvisionthermographicaugmented name=visibilityvision value=3 onclick=WeaponSelected() />
+										</td>
+										<td class=SubTable>
+											<center>
+											<input type=radio id=visibilityvisionthermographicnatural name=visibilityvision value=4 onclick=WeaponSelected() />
+										</td>
+									</tr>
+									<tr>
+										<td class=SubTable>
+											<input type=radio id=visibilityconditionnormal checked=checked name=visibilitycondition value=0 onclick=WeaponSelected() />
+											<b> Normal</b>
+										</td>
+										<td class=SubTable>
+											<center>+0
+										</td>
+										<td class=SubTable>
+											<center>+0
+										</td>
+										<td class=SubTable>
+											<center>+0
+										</td>
+										<td class=SubTable>
+											<center>+0
+										</td>
+										<td class=SubTable>
+											<center>+0
+										</td>
+									</tr>
+									<tr>
+										<td class=SubTable>
+											<input type=radio id=visibilityconditionfulldarkness name=visibilitycondition value=1 onclick=WeaponSelected() />
+											<b> Full Darkness</b>
+										</td>
+										<td class=SubTable>
+											<center>+8
+										</td>
+										<td class=SubTable>
+											<center>+8
+										</td>
+										<td class=SubTable>
+											<center>+8
+										</td>
+										<td class=SubTable>
+											<center>+4
+										</td>
+										<td class=SubTable>
+											<center>+2
+										</td>
+									</tr>
+									<tr>
+										<td class=SubTable>
+											<input type=radio id=visibilityconditionminimallight name=visibilitycondition value=2 onclick=WeaponSelected() />
+											<b> Minimal Light</b>
+										</td>
+										<td class=SubTable>
+											<center>+6
+										</td>
+										<td class=SubTable>
+											<center>+4
+										</td>
+										<td class=SubTable>
+											<center>+2
+										</td>
+										<td class=SubTable>
+											<center>+4
+										</td>
+										<td class=SubTable>
+											<center>+2
+										</td>
+									</tr>
+									<tr>
+										<td class=SubTable>
+											<input type=radio id=visibilityconditionpartiallight name=visibilitycondition value=3 onclick=WeaponSelected() />
+											<b> Partial Light</b>
+										</td>
+										<td class=SubTable>
+											<center>+2
+										</td>
+										<td class=SubTable>
+											<center>+1
+										</td>
+										<td class=SubTable>
+											<center>+0
+										</td>
+										<td class=SubTable>
+											<center>+2
+										</td>
+										<td class=SubTable>
+											<center>+1
+										</td>
+									</tr>
+									<tr>
+										<td class=SubTable>
+											<input type=radio id=visibilityconditionglare name=visibilitycondition value=4 onclick=WeaponSelected() />
+											<b> Glare</b>
+										</td>
+										<td class=SubTable>
+											<center>+2
+										</td>
+										<td class=SubTable>
+											<center>+4
+										</td>
+										<td class=SubTable>
+											<center>+2
+										</td>
+										<td class=SubTable>
+											<center>+4
+										</td>
+										<td class=SubTable>
+											<center>+2
+										</td>
+									</tr>
+									<tr>
+										<td class=SubTable>
+											<input type=radio id=visibilityconditionmist name=visibilitycondition value=5 onclick=WeaponSelected() />
+											<b> Mist</b>
+										</td>
+										<td class=SubTable>
+											<center>+2
+										</td>
+										<td class=SubTable>
+											<center>+4
+										</td>
+										<td class=SubTable>
+											<center>+2
+										</td>
+										<td class=SubTable>
+											<center>+4
+										</td>
+										<td class=SubTable>
+											<center>+2
+										</td>
+									</tr>
+									<tr>
+										<td class=SubTable>
+											<input type=radio id=visibilityconditionlightsmokefograin name=visibilitycondition value=6 onclick=WeaponSelected() />
+											<b> Light Smoke/Fog/Rain</b>
+										</td>
+										<td class=SubTable>
+											<center>+4
+										</td>
+										<td class=SubTable>
+											<center>+4
+										</td>
+										<td class=SubTable>
+											<center>+2
+										</td>
+										<td class=SubTable>
+											<center>+0
+										</td>
+										<td class=SubTable>
+											<center>+0
+										</td>
+									</tr>
+									<tr>
+										<td class=SubTable>
+											<input type=radio id=visibilityconditionheavysmokefograin name=visibilitycondition value=7 onclick=WeaponSelected() />
+											<b> Heavy Smoke/Fog/Rain</b>
+										</td>
+										<td class=SubTable>
+											<center>+6
+										</td>
+										<td class=SubTable>
+											<center>+6
+										</td>
+										<td class=SubTable>
+											<center>+4
+										</td>
+										<td class=SubTable>
+											<center>+1
+										</td>
+										<td class=SubTable>
+											<center>+0
+										</td>
+									</tr>
+									<tr>
+										<td class=SubTable>
+											<input type=radio id=visibilityconditionthermalsmoke name=visibilitycondition value=8 onclick=WeaponSelected() />
+											<b> Thermal Smoke</b>
+										</td>
+										<td class=SubTable>
+											<center>+4
+										</td>
+										<td class=SubTable>
+											<center>+4
+										</td>
+										<td class=SubTable>
+											<center>+4
+										</td>
+										<td class=SubTable>
+											<center>+8
+										</td>
+										<td class=SubTable>
+											<center>+6
+										</td>
+									</tr>
+								</tbody>
+							</table>
+						</td>
+					</tr>
+					<tr>
+						<td colspan=3>
+							<hr>
+							<center>
+							<b>Wounds</b>
+							<hr>
+						</td>
+					</tr>
+					<tr>
+						<td>
+							<b>Stun Damage</b>
+						</td>
+						<td>
+							<input type=number id=stundamagetaken value=0 size=2 min=0 max=100 onchange=WeaponSelected() onclick=WeaponSelected() />
+						</td>
+						<td>
+							...
+						</td>
+					</tr>
+					<tr>
+						<td>
+							<b>Physical Damage</b>
+						</td>
+						<td>
+							<input type=number id=physicaldamagetaken value=0 size=2 min=0 max=100 onchange=WeaponSelected() onclick=WeaponSelected() />
+						</td>
+						<td>
+							...
+						</td>
+					</tr>
+					<tr>
+						<td colspan=3>
+							<hr>
+							<center>
+							<b>Other Modifiers</b>
+							<hr>
+						</td>
+					</tr>
+					<tr>
+						<td colspan=3>
+							<center><input type=number id=othermodifiers value=0 size=2 min=0 max=100 onchange=WeaponSelected() onclick=WeaponSelected() />
+						</td>
+					</tr>
+					<tr>
+						<td colspan=3>
+							<hr>
+							<center><b>Target Number
+							<hr>
+						</td>
+					</tr>
+
+					<tr>
+						<td colspan=3>
+							<center><input readonly size=1 id=outputTN2 />
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		</center>
+	</body>
+</html>
