@@ -1,191 +1,180 @@
-<html>
-	<head>
-		<title>
-			AlanDSaster's Tools For Shadowrun 3rd Edition
-		</title>
+<style>
 
-		<style>
+		/**************************************************************************/
+		/*
+		/* Default Formatting
+		/*
+		/**************************************************************************/
 
-				/**************************************************************************/
-				/*
-				/* Default Formatting
-				/*
-				/**************************************************************************/
+		.tooltip {
+			position: relative;
+			display: inline-block;
+			border-bottom: 1px dotted black; /* If you want dots under the hoverable text */
+		}
 
-				.tooltip {
-					position: relative;
-					display: inline-block;
-					border-bottom: 1px dotted black; /* If you want dots under the hoverable text */
-				}
+		/* Tooltip text */
+		.tooltip .tooltiptext {
+			visibility: hidden;
+			width: 240px;
+			background-color: black;
+			color: #fff;
+			text-align: center;
+			padding: 5px 0;
+			border-radius: 6px;
 
-				/* Tooltip text */
-				.tooltip .tooltiptext {
-					visibility: hidden;
-					width: 240px;
-					background-color: black;
-					color: #fff;
-					text-align: center;
-					padding: 5px 0;
-					border-radius: 6px;
+			/* Position the tooltip text - see examples below! */
+			position: absolute;
+			z-index: 1;
+		}
 
-					/* Position the tooltip text - see examples below! */
-					position: absolute;
-					z-index: 1;
-				}
+		/* Show the tooltip text when you mouse over the tooltip container */
+		.tooltip:hover .tooltiptext {
+			visibility: visible;
+		}
 
-				/* Show the tooltip text when you mouse over the tooltip container */
-				.tooltip:hover .tooltiptext {
-					visibility: visible;
-				}
+		input:focus {
+			border: 1px solid #555;
+			background-color: #EEEEEE;
+		}
 
-				input:focus {
-					border: 1px solid #555;
-					background-color: #EEEEEE;
-				}
+		input:read-only {
+			background-color: #BBBBBB;
+			color: #000000;
+		}
 
-				input:read-only {
-					background-color: #BBBBBB;
-					color: #000000;
-				}
+		input {
+			text-align: center;
+		}
 
-				input {
-					text-align: center;
-				}
+		body {
+			background-color:black;
+		}
+		table {
+			background-color:white;
+			vertical-align: top;
+		}
+		th {
+			vertical-align: top;
+		}
+		td {
+			vertical-align: top;
+			/*text-align: left;*/
+		}
+		/**************************************************************************/
+		/*
+		/* Layout Control Table
+		/*
+		/**************************************************************************/
 
-				body {
-					background-color:black;
-				}
-				table {
-					background-color:white;
-					vertical-align: top;
-				}
-				th {
-					vertical-align: top;
-				}
-				td {
-					vertical-align: top;
-					/*text-align: left;*/
-				}
-				/**************************************************************************/
-				/*
-				/* Layout Control Table
-				/*
-				/**************************************************************************/
+		table.LayoutControl {
+			border: 1px solid black;
+			padding: 10px;
+			border-radius:12px;
+			width:1px;
+			white-space: nowrap;
+			text-align: center;
+		}
 
-				table.LayoutControl {
-					border: 1px solid black;
-					padding: 10px;
-					border-radius:12px;
-					width:1px;
-					white-space: nowrap;
-					text-align: center;
-				}
+		text.LayoutControl {
+			white-space: nowrap;
+		}
 
-				text.LayoutControl {
-					white-space: nowrap;
-				}
+		tr:hover.LayoutControl {
+			background-color: #EEEEEE;
+		}
 
-				tr:hover.LayoutControl {
-					background-color: #EEEEEE;
-				}
+		th.LayoutControl {
+			font-variant: small-caps;
+			padding:12px;
+			text-align:center;
+		}
 
-				th.LayoutControl {
-					font-variant: small-caps;
-					padding:12px;
-					text-align:center;
-				}
+		td.LayoutControl {
+			padding-right: 8px;
+		}
 
-				td.LayoutControl {
-					padding-right: 8px;
-				}
+		input:focus.LayoutControl {
+			border: 1px solid #555;
+			background-color: #EEEEEE;
+		}
 
-				input:focus.LayoutControl {
-					border: 1px solid #555;
-					background-color: #EEEEEE;
-				}
+		input:read-only.LayoutControl {
+			background-color: #BBBBBB;
+			color: #000000;
+		}
 
-				input:read-only.LayoutControl {
-					background-color: #BBBBBB;
-					color: #000000;
-				}
+		button.LayoutControl {
+			box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2), 0 6px 10px 0 rgba(0,0,0,0.19);
+		}
 
-				button.LayoutControl {
-					box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2), 0 6px 10px 0 rgba(0,0,0,0.19);
-				}
+		button:hover.LayoutControl {
+			box-shadow: 0 4px 8px 0 rgba(0,0,0,0.24), 0 6px 10px 0 rgba(0,0,0,0.19);
+		}
 
-				button:hover.LayoutControl {
-					box-shadow: 0 4px 8px 0 rgba(0,0,0,0.24), 0 6px 10px 0 rgba(0,0,0,0.19);
-				}
+		/**************************************************************************/
+		/*
+		/* Sub Table
+		/*
+		/**************************************************************************/
 
-				/**************************************************************************/
-				/*
-				/* Sub Table
-				/*
-				/**************************************************************************/
+		table.SubTable {
+			padding: 10px;
+			border: 1px solid black;
+			border-collapse: collapse;
 
-				table.SubTable {
-					padding: 10px;
-					border: 1px solid black;
-					border-collapse: collapse;
+		}
 
-				}
+		th.SubTable {
+			padding: 10px;
+			border: 1px solid black;
 
-				th.SubTable {
-					padding: 10px;
-					border: 1px solid black;
+		}
 
-				}
+		td.SubTable {
+			padding: 5px;
+			border: 1px solid black;
+			vertical-align: top;
+			/*text-align: left;*/
 
-				td.SubTable {
-					padding: 5px;
-					border: 1px solid black;
-					vertical-align: top;
-					/*text-align: left;*/
+		}
 
-				}
-
-		</style>
-	</head>
-
-	<body>
-		<center>
-			<table class=LayoutControl>
-				<tr>
-					<th>
-						Combat Tools
-					</th>
-				</tr>
-				<tr>
-					<td>
-						<a href="MeleeTNCalculator.html">Melee Combat TN Calculator</a>
-					</td>
-				</tr>
-				<tr>
-					<td>
-						<a href="RangedCombatTNCalculator.html">Ranged Combat TN Calculator</a>
-					</td>
-				</tr>
-				<tr>
-					<th>
-						Character Improvement Tools
-					</th>
-				</tr>
-				<tr>
-					<td>
-						<a href="KarmaCostCalculator.html">Skill/Ability Improvement Karma Cost Calculator</a>
-					</td>
-				</tr>
-				<tr>
-					<th>
-						Vehicle/Drone Tools
-					</th>
-				</tr>
-				<tr>
-					<td>
-						<a href="VehicleRepairCalculator.html">Vehicle Repair Target Number and Cost Calculator</a>
-					</td>
-				</tr>
-			</table>
-		</center>
-	</body>
-</html>
+</style>
+<center>
+	<table class=LayoutControl>
+		<tr>
+			<th>
+				Combat Tools
+			</th>
+		</tr>
+		<tr>
+			<td>
+				<a href="MeleeTNCalculator.html">Melee Combat TN Calculator</a>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<a href="RangedCombatTNCalculator.html">Ranged Combat TN Calculator</a>
+			</td>
+		</tr>
+		<tr>
+			<th>
+				Character Improvement Tools
+			</th>
+		</tr>
+		<tr>
+			<td>
+				<a href="KarmaCostCalculator.html">Skill/Ability Improvement Karma Cost Calculator</a>
+			</td>
+		</tr>
+		<tr>
+			<th>
+				Vehicle/Drone Tools
+			</th>
+		</tr>
+		<tr>
+			<td>
+				<a href="VehicleRepairCalculator.html">Vehicle Repair Target Number and Cost Calculator</a>
+			</td>
+		</tr>
+	</table>
+</center>
